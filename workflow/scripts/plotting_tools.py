@@ -71,7 +71,7 @@ def _get_layouts(nplots: int):
         layout = """
             AB
             """
-        figsize = (7, 4)
+        figsize = (7, 2.8)
     elif nplots == 3:
         layout = """
             AABB
