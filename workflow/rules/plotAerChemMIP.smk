@@ -588,7 +588,8 @@ rule plot_change_concso4:
         units = '[Tg]',
         abs_minmax=[1e-5,1]
 
-
+    conda:
+        "dustysnake"
     notebook:
         "../notebooks/dust_analysis/plot_change_so4burden.py.ipynb"
 
