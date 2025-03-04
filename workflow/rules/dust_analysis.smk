@@ -207,6 +207,9 @@ rule plot_dust_emissions_and_burden_change:
                                     'GFDL-ESM4', 'CNRM-ESM2-1']),
     output:
         outpath = outdir +'figs/ACP_paper/fig1_dust_emissions_and_burden_change.png'
+
+    conda:
+        "dustysnake"
     notebook:
         "../notebooks/dust_analysis/dust_emissions_and_burden_change.py.ipynb"
 
@@ -224,6 +227,9 @@ rule plot_cloud_diagnostic_table:
         mask = outdir + 'masks/dust_regions.nc',
     output:    
         outpath = outdir + 'figs/AerChemMIP/dust_cloud_diagnostic_table.pdf'
+
+    conda:
+        "dustysnake"
 
     notebook:
         "../notebooks/dust_analysis/dust_cloud_diagnostic_table.py.ipynb"
@@ -247,6 +253,9 @@ rule arc_precip_scatter_plot:
 
     output:
         outpath = outdir + 'figs/AerChemMIP/arc_precip_scatter_plot.pdf'
+    conda:
+        "dustysnake"
+
     notebook:
         "../notebooks/dust_analysis/arc_precip_scatter_plot.py.ipynb"
 
