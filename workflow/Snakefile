@@ -73,4 +73,23 @@ include: 'rules/plotAerChemMIP.smk'
 include: 'rules/dust_analysis.smk'
 include: 'rules/make_table.smk'
 
+rule all:
+    input:
+        outdir + "figs/AerChemMIP/merged_cloudEffect_and_diagnostics.png",
+        outdir + "figs/AerChemMIP/merged_directEffect_and_diagnostics.png",
+        outdir + "figs/AerChemMIP/LWDirectEff_piClim-2xdust_AerChemMIP_albedo-forcing_relationship.png",
+        outdir + "figs/AerChemMIP/arc_precip_scatter_plot.pdf",
+        outdir + "figs/AerChemMIP/DirectEff_piClim-2xdust_AerChemMIP_albedo-forcing_relationship.png",
+        outdir + "figs/AerChemMIP/total_dust_ERF_figure.png",
+        outdir + "figs/AerChemMIP/model_surface_albedo_piClim-control.png",
+        outdir + "figs/AerChemMIP/dust_interest_region_diagnostics.pdf",
+        outdir + "figs/ACP_paper/fig1_dust_emissions_and_burden_change.png",
+        outdir + "figs/AerChemMIP/delta_2xdust/ccn_piClim-2xdust_AerChemMIP_abs.png"
+        
+        
+        
+
+        
+        
+    
 
