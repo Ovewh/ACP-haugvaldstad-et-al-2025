@@ -128,6 +128,7 @@ table_ids:
   abs550aer: 'AERmon'
   mmrnh4: 'AERmon'
   mmrno3: 'AERmon'
+  hno3: 'AERmon'
   mrsos: 'Lmon'
 
 variables: 
@@ -175,6 +176,7 @@ burdens_dict:
   concnh4 : 'mmrnh4'
   conco3: 'o3'
   concno3: 'mmrno3'
+  conchno3: 'hno3'
 
 # These variables will be accumulated when resampled e.g. from Amon to Ayear
 accumalative_vars:

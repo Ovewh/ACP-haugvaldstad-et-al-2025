@@ -4,6 +4,9 @@ ERFs:
 - ERFt
 - ERFsurf
 - atmabs
+- ERFsurfcs
+- ERFsurfswcs
+- ERFsurflw
 - atmabsSW
 - SWDirectEff
 - LWDirectEff

@@ -5,6 +5,7 @@ from pyclim_noresm.general_util_funcs import global_avg
 import numpy as np
 import pandas as pd
 import cftime
+import time
 def get_forcing(forcing_var: str,dataframes: dict):
     k = next(iter(dataframes))
     outdf = pd.DataFrame(index=dataframes.keys(), columns=dataframes[k].columns)
@@ -390,9 +391,6 @@ def model_levels_to_pressure_levels(ds: xr.Dataset | xr.DataArray,
     """
     Convert model levels to pressure levels.
     """
-    import time
-    import pathlib as pl
-
     try:
         import geocat.comp as geocomp
     except ImportError:
@@ -454,7 +452,7 @@ def model_levels_to_pressure_levels(ds: xr.Dataset | xr.DataArray,
 
     outds.attrs["history"] = (
         outds.attrs.get("history", "")
-        + f"@{time.ctime()} converted to standard pressure levels {pl.Path.cwd().parts[-1]}"
+        + f"@{time.ctime()} converted to standard pressure levels"
     )
     return outds
 
@@ -519,12 +517,12 @@ def resample_time(data, variable_id=None):
     
     if da.units == 'kg m-2 s-1': # annual emission / deposition 
         da = da*365*24*60*60 # convert to kg m-2 yr-1
-        da = da.resample(time='Y').mean()
+        da = da.resample(time='YE').mean()
         da.attrs = {**da.attrs, **variable_attrs}
         da.attrs['units'] = '{} year-1'.format(' '.join(data[vname].attrs['units'].split(' ')[:-1]))
         da.attrs['history'] = data.attrs.get('history', '') + f', annual average converted to kg m-2 yr-1'
     else:
-        da=da.resample(time='Y').mean()
+        da=da.resample(time='YE').mean()
         da.attrs = {**da.attrs, **variable_attrs}
         # data[vname].attrs = attrs
         da.attrs['history'] = da.attrs.get('history','') + f', annual average'    
@@ -533,7 +531,7 @@ def resample_time(data, variable_id=None):
     out_ds = coords_ds.assign({vname: da})
     if 'ps' in data.data_vars or 'ps' in data.coords:
         with xr.set_options(keep_attrs=True):
-            out_ds = out_ds.assign({'ps': data['ps'].resample(time='Y').mean()})
+            out_ds = out_ds.assign({'ps': data['ps'].resample(time='YE').mean()})
 
     out_ds.attrs = data_attrs
 
