@@ -327,37 +327,6 @@ rule plot_change_prs:
     notebook:
         "../notebooks/plot_change_notebook.py.ipynb"
 
-rule plot_change_mrsos:
-    input:
-        path_exp = expand(outdir+'piClim-2xdust/mrsos/mrsos_piClim-2xdust_{model}_Ayear.nc',
-                 model=['GISS-E2-1-G', 'IPSL-CM6A-LR-INCA', 
-                        'MIROC6','UKESM1-0-LL', 'GFDL-ESM4', 'MPI-ESM-1-2-HAM',
-                        'CNRM-ESM2-1','NorESM2-LM']),
-        path_ctrl=expand(outdir+'piClim-control/mrsos/mrsos_piClim-control_{model}_Ayear.nc',
-                model=['GISS-E2-1-G', 'IPSL-CM6A-LR-INCA', 
-                        'MIROC6','UKESM1-0-LL', 'GFDL-ESM4', 'MPI-ESM-1-2-HAM',
-                        'CNRM-ESM2-1','NorESM2-LM'])
-
-    
-    output:
-        outpath=outdir+'figs/AerChemMIP/delta_2xdust/mrsos_piClim-2xdust_AerChemMIP_{kind}.png'
-    wildcard_constraints:
-        kind='abs|rel'
-
-    params:
-        label='$\Delta$ Soilmoistrue',
-        rel_minmax=[-60,60],
-        abs_minmax=[-4,4],
-        scaling_factor=1,
-        units = "[kg m-2]",
-        cmap='BrBG',
-        draw_error_mask=True,
-        projection='EckertIV'
-
-    notebook:
-        "../notebooks/plot_change_notebook.py.ipynb"
-
-
 
 rule plot_emidust:
     input:
@@ -378,26 +347,6 @@ rule plot_emidust:
     notebook:
         "../notebooks/plot_emidust.py.ipynb"
 
-rule plot_depdust:
-    input:
-        paths=expand(outdir+'{experiment}/depdust/depdust_{experiment}_{model}_Amon.nc',
-                    model=['EC-Earth3-AerChem', 'GISS-E2-1-G', 'IPSL-CM6A-LR-INCA',
-                        'GFDL-ESM4', 'MPI-ESM-1-2-HAM',
-                        'CNRM-ESM2-1','NorESM2-LM'], allow_missing=True),
-        areacello = expand('workflow/input_data/gridarea_{model}.nc',
-                    model=['EC-Earth3-AerChem', 'GISS-E2-1-G', 'IPSL-CM6A-LR-INCA',
-                        'GFDL-ESM4', 'MPI-ESM-1-2-HAM',
-                        'CNRM-ESM2-1','NorESM2-LM'])
-    params:
-        regrid=False
-
-    output:
-        outpath=outdir+'figs/AerChemMIP/depdust_{experiment}_Ayear_map.png' 
-    wildcard_constraints:
-        experiment="|".join(CONTROL_EXPS)
-    
-    notebook:
-        "../notebooks/plot_emidust.py.ipynb"
 
 rule plot_level_cloud_changes:
     input:
@@ -416,18 +365,6 @@ rule plot_level_cloud_changes:
 
     notebook:
         "../notebooks/plot_level_cloud_change.py.ipynb"
-
-rule plot_single_model_cloud_canges:
-    input:
-        path = outdir+'piClim-2xdust/delta_{variable}/delta_{variable}_piClim-2xdust_{model}.nc'
-    output:
-        outpath = outdir+'figs/AerChemMIP/delta_2xdust/single_model_plots/delta_{variable}_{plevel}_piClim-2xdust_{model}.png'
-
-    wildcard_constraints:
-        plevel='low|middle|high'
-    
-    notebook:
-        "../notebooks/plot_level_cloud_change_single_model.py.ipynb"
 
 
 rule plot_lwp_aerchemmip:
@@ -524,18 +461,6 @@ rule plot_pr_aerchemmip:
     notebook:
         "../notebooks/plot_absolute_fields.py.ipynb"
 
-rule plot_level_changes:
-    input:
-        expand(rules.plot_level_cloud_changes.output, variable=['cli', 'cl'], plevel=['low','middle','high'],
-            model=['GISS-E2-1-G','EC-Earth3-AerChem','GFDL-ESM4', 'MIROC6','CNRM-ESM2-1','NorESM2-LM','MPI-ESM-1-2-HAM'])
-
-rule plot_changes_dust_loading:
-    input:
-        expand(rules.plot_single_model_cloud_canges.output, 
-                model=['EC-Earth3-AerChem', 
-                    'MIROC6' , 'GISS-E2-1-G','GFDL-ESM4',
-                    'MPI-ESM-1-2-HAM', 'UKESM1-0-LL',
-                        'CNRM-ESM2-1','NorESM2-LM'], variable='loaddust', plevel=['low','middle','high'])
 
 rule plot_change_concdust:
     input:
@@ -593,84 +518,4 @@ rule plot_change_concso4:
         "dustysnake"
     notebook:
         "../notebooks/dust_analysis/plot_change_so4burden.py.ipynb"
-
-rule plot_change_concpm1:
-    input:
-        path_exp = expand(outdir + "piClim-2xdust/derived_variables/concpm1/concpm1_{model}_piClim-2xdust_Ayear.nc",
-                model=[ 'MPI-ESM-1-2-HAM'
-                   , 'GFDL-ESM4',
-                        'NorESM2-LM']),
-        path_ctrl = expand(outdir + "piClim-control/derived_variables/concpm1/concpm1_{model}_piClim-control_Ayear.nc", 
-                    model = [ 'MPI-ESM-1-2-HAM'
-                     , 'GFDL-ESM4',
-                        'NorESM2-LM']),
-        areacello = 'workflow/input_data/common_grid.nc'
-
-    output:
-        outpath=outdir+'figs/AerChemMIP/delta_2xdust/concpm1_piClim-2xdust_AerChemMIP_{kind}.png'
-
-    wildcard_constraints:
-        kind='abs|rel'
-
-    params:
-        label = '$\Delta$ PM1 burden',
-        scaling_factor = 1e-9,
-        units = '[Tg]',
-        abs_minmax=[1e-5,1]
-
-
-    notebook:
-        "../notebooks/dust_analysis/plot_change_pm1burden.py.ipynb"
-
-
-rule plot_change_od550so4:
-    input:
-        path_exp = expand(outdir+'piClim-2xdust/od550so4/od550so4_piClim-2xdust_{model}_Ayear.nc',
-                 model=['EC-Earth3-AerChem',
-                          'MPI-ESM-1-2-HAM'
-                       ], allow_missing=True),
-        path_ctrl=expand(outdir+'piClim-control/od550so4/od550so4_piClim-control_{model}_Ayear.nc',
-                 model=['EC-Earth3-AerChem', 
-                         'MPI-ESM-1-2-HAM'
-                        ], allow_missing=True)
-
-    
-    output:
-        outpath=outdir+'figs/AerChemMIP/delta_2xdust/od550so4_piClim-2xdust_AerChemMIP_{kind}.png'
-    wildcard_constraints:
-        kind='abs'
-    params:
-        add_global_avg=True,
-        abs_minmax=[-1,1],
-        log_norm=False,
-    conda: "dustysnake"
-    notebook:
-        "../notebooks/plot_change_notebook.py.ipynb"
-
-
-
-
-rule plot_change_conch2oaer:
-    input:
-        path_exp = expand(outdir+'piClim-2xdust/derived_variables/conch2oaer/conch2oaer_{model}_piClim-2xdust_Ayear.nc',
-                 model=['EC-Earth3-AerChem', 'IPSL-CM6A-LR-INCA',
-                          'MPI-ESM-1-2-HAM','UKESM1-0-LL',
-                       'NorESM2-LM', 'MIROC6'], allow_missing=True),
-        path_ctrl=expand(outdir+'piClim-control/derived_variables/conch2oaer/conch2oaer_{model}_piClim-control_Ayear.nc',
-                 model=['EC-Earth3-AerChem',  'IPSL-CM6A-LR-INCA',
-                         'MPI-ESM-1-2-HAM','UKESM1-0-LL',
-                        'NorESM2-LM', 'MIROC6'], allow_missing=True)
-
-    
-    output:
-        outpath=outdir+'figs/AerChemMIP/delta_2xdust/conch2oaer_piClim-2xdust_AerChemMIP_{kind}.png'
-    wildcard_constraints:
-        kind='abs'
-    params:
-        add_global_avg=True,
-        abs_minmax=[-1,1],
-        log_norm=True,
-    conda: "dustysnake"
-    notebook:
-        "../notebooks/plot_change_notebook.py.ipynb"
 

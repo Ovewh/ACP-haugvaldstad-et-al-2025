@@ -28,9 +28,6 @@ rule build_catalogues:
         expand('catalogues/{activity}_{source}_CMIP6.csv.gz', 
                 activity = config['activities'], 
                 source = config['sources']),
-        # 'catalogues/AerChemMIP_noresm_CMIP6.csv.gz',
-        # 'catalogues/RFMIP_noresm_CMIP6.csv.gz')
-        # 'catalogues/CMIP_nirdCMIPtemp_CMIP6.csv.gz'
     output:
         table='catalogues/merge_CMIP6.csv',
         json='catalogues/merge_CMIP6.json'
@@ -155,9 +152,6 @@ rule column_integrate_cdnc_UKESM:
     notebook:
         "../notebooks/derive_column_integrated_cdnc.py.ipynb"
 
-
-
-
 rule derive_column_integrated_load_airmass:
     input:
         mmr = lambda w: expand(output_format['single_variable'], model=w.model, experiment=w.experiment,
@@ -199,46 +193,6 @@ rule mask_dust_regions:
     notebook:
         "../notebooks/mask_dust_regions.py.ipynb"
 
-
-rule derived_windspeed:
-    input:
-        u = lambda w: expand(output_format['single_variable'], model=w.model, experiment=w.experiment,
-                    freq=w.freq, variable='ua'),
-        v = lambda w: expand(output_format['single_variable'], model=w.model, experiment=w.experiment,
-                    freq=w.freq, variable='va'),
-    output:
-        outpath = outdir + '{experiment}/derived_variables/windspeed/windspeed_{model}_{experiment}_{freq}.nc'
-    notebook:
-        "../notebooks/derive_windspeed.py.ipynb"
-
-rule cmip6_to_aerocom_fmt:
-    input:
-        paths = lambda w: get_paths(w,w.variable,w.experiment,grid_label=config['default_grid_label'])
-    output:
-        outpath = outdir+'{model}_{experiment}/renamed/converted_CMIP6_aerocom_{variable}.txt'
-    
-    notebook:
-        "../convert_to_aerocom_fmt.py.ipynb"
-
-rule calc_friction_velocity:
-    input:
-        tauu = lambda w: expand(output_format['single_variable'], model=w.model, experiment=w.experiment,
-                    freq='Amon', variable='tauu',ext='nc'),
-        tauv = lambda w: expand(output_format['single_variable'], model=w.model, experiment=w.experiment,
-                    freq='Amon', variable='tauv',ext='nc'),
-        pa = lambda w: expand(output_format['single_variable'], model=w.model, experiment=w.experiment,
-                    freq='Amon', variable='ps',ext='nc'),
-        
-        tas = lambda w: expand(output_format['single_variable'], model=w.model, experiment=w.experiment,
-                freq='Amon', variable='tas', ext='nc'),
-        mask = outdir + 'masks/dust_regions.nc',
-        universial_area_mask = 'workflow/input_data/common_grid.nc', 
-        model_area_mask = 'workflow/input_data/gridarea_{model}.nc'
-    output:
-        outpath = outdir + '{experiment}/derived_variables/ustar/ustar_{model}_{experiment}_Ayear.nc'
-
-    notebook:
-        "../notebooks/calc_friction_velocity.py.ipynb"
 
 rule calc_cloud_fraction:
     input:
