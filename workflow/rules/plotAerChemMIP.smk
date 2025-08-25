@@ -291,6 +291,7 @@ rule plot_ccn_change:
         label = '$\Delta$ CCN',
         scaling_factor = 1e-6,
         units = 'cm$^{-3}$',
+        add_global_avg = True
 
 
     notebook:
@@ -622,6 +623,32 @@ rule plot_change_concpm1:
         "../notebooks/dust_analysis/plot_change_pm1burden.py.ipynb"
 
 
+rule plot_change_od550so4:
+    input:
+        path_exp = expand(outdir+'piClim-2xdust/od550so4/od550so4_piClim-2xdust_{model}_Ayear.nc',
+                 model=['EC-Earth3-AerChem',
+                          'MPI-ESM-1-2-HAM'
+                       ], allow_missing=True),
+        path_ctrl=expand(outdir+'piClim-control/od550so4/od550so4_piClim-control_{model}_Ayear.nc',
+                 model=['EC-Earth3-AerChem', 
+                         'MPI-ESM-1-2-HAM'
+                        ], allow_missing=True)
+
+    
+    output:
+        outpath=outdir+'figs/AerChemMIP/delta_2xdust/od550so4_piClim-2xdust_AerChemMIP_{kind}.png'
+    wildcard_constraints:
+        kind='abs'
+    params:
+        add_global_avg=True,
+        abs_minmax=[-1,1],
+        log_norm=False,
+    conda: "dustysnake"
+    notebook:
+        "../notebooks/plot_change_notebook.py.ipynb"
+
+
+
 
 rule plot_change_conch2oaer:
     input:
@@ -643,7 +670,7 @@ rule plot_change_conch2oaer:
         add_global_avg=True,
         abs_minmax=[-1,1],
         log_norm=True,
-
+    conda: "dustysnake"
     notebook:
         "../notebooks/plot_change_notebook.py.ipynb"
 

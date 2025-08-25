@@ -10,9 +10,11 @@ rule refractive_index_and_absorption:
         erfs = expand(outdir + 'piClim-2xdust/ERFs/ERF_tables/piClim-2xdust_{model}.csv',
         model = ['NorESM2-LM', 'MPI-ESM-1-2-HAM', 'CNRM-ESM2-1','EC-Earth3-AerChem', 'GISS-E2-1-G',
                         'UKESM1-0-LL', 'MIROC6', 'IPSL-CM6A-LR-INCA', 'GFDL-ESM4'])
-    
+    wildcard_constraints:
+        variable = "SWDirectEff|DirectEff"
+
     output: 
-        absortion_plot = outdir+'figs/AerChemMIP/SWDirectEff_AAOD_refractive_index.png'
+        absortion_plot = outdir+'figs/AerChemMIP/{variable}_AAOD_refractive_index.png'
 
     notebook:
         "../notebooks/dust_analysis/optical_properties_absorption.py.ipynb"
@@ -59,7 +61,7 @@ rule calculate_lifetime:
     output:
         table = outdir + "{experiment}/{variable}/lifetime_{experiment}_{variable}_{model}_Ayear.yaml"
     wildcard_constraints:
-        variables = "dulifetime|so4lifetime|pm1lifetime|concss"
+        variable = "dulifetime|so4lifetime|pm1lifetime|concss"
 
     notebook:
         "../notebooks/dust_analysis/lifetime.py.ipynb"
@@ -141,6 +143,27 @@ rule make_dust_cloud_diag_file_IPSL:
     notebook:
         "../notebooks/dust_analysis/make_dust_cloud_diag_file.py.ipynb"
 
+rule make_dust_cloud_diag_file_EC_EARTH:
+    input:
+        catalog = ancient(rules.build_catalogues.output.json),
+        mask = outdir + 'masks/dust_regions.nc',
+        cdncvi = outdir + '{experiment}/derived_variables/cdncvi/cdncvi_EC-Earth3-AerChem_{experiment}_Ayear.nc',
+        universial_area_mask = 'workflow/input_data/common_grid.nc', 
+        model_area_mask = 'workflow/input_data/gridarea_EC-Earth3-AerChem.nc',
+        clfractions = expand(outdir + '{experiment}/derived_variables/{clfrac}/{clfrac}_EC-Earth3-AerChem_{experiment}_Ayear.nc',
+                            clfrac=['clhigh','clmiddle','cllow'], allow_missing=True)
+    output:
+        dust_cloud_diag_exp = outdir + 'dust_diag_files/dust_cloud_diag_EC-Earth3-AerChem_{experiment}.nc',
+
+    wildcard_constraints:
+        experiment = 'piClim-2xdust|piClim-control'
+
+    conda:
+        "geocat"
+
+    notebook:
+        "../notebooks/dust_analysis/make_dust_cloud_diag_file.py.ipynb"
+        
 
 rule make_dust_cloud_diag_file:
     input: 
@@ -153,7 +176,7 @@ rule make_dust_cloud_diag_file:
         dust_cloud_diag_exp = outdir + 'dust_diag_files/dust_cloud_diag_{model}_{experiment}.nc',
     wildcard_constraints:
         experiment = 'piClim-2xdust|piClim-control',
-        model="(?!IPSL-CM6A-LR-INCA).*"
+        model="(?!IPSL-CM6A-LR-INCA|EC-Earth3-AerChem).*"
     conda:
         "geocat"
 
@@ -473,7 +496,6 @@ rule scatter_plot_albedo_forcing_efficiency:
         exp_data = expand(outdir + 'dust_diag_files/dust_diag_{model}_piClim-2xdust.nc',
                 model=['NorESM2-LM', 'MPI-ESM-1-2-HAM', 'EC-Earth3-AerChem', 'GISS-E2-1-G',
                         'UKESM1-0-LL', 'IPSL-CM6A-LR-INCA', 'GFDL-ESM4', 'CNRM-ESM2-1']),
-
         paths=expand(outdir+'piClim-2xdust/ERFs/{vName}/{vName}_piClim-2xdust_{model}_Ayear.nc',
             model=['MPI-ESM-1-2-HAM','EC-Earth3-AerChem','CNRM-ESM2-1','NorESM2-LM','UKESM1-0-LL','GFDL-ESM4','IPSL-CM6A-LR-INCA',
             ], allow_missing=True)
@@ -483,3 +505,23 @@ rule scatter_plot_albedo_forcing_efficiency:
             outpath= outdir+'figs/AerChemMIP/{vName}_piClim-2xdust_AerChemMIP_albedo-forcing_relationship.png'
     notebook:
             "../notebooks/dust_analysis/albedo_direct_forcing_relationship.py.ipynb"
+
+rule plot_dust_indirect_effect_on_chemistry:
+    input:
+        exp_vars = expand(outdir + 'piClim-2xdust/{var}/{var}_piClim-2xdust_{model}_Ayear.nc',
+                model=['UKESM1-0-LL', 'MPI-ESM-1-2-HAM', 'EC-Earth3-AerChem'], var = ['so2']),
+        ctrl_vars = expand(outdir + 'piClim-2xdust/{var}/{var}_piClim-2xdust_{model}_Ayear.nc',
+                model=['UKESM1-0-LL', 'MPI-ESM-1-2-HAM', 'EC-Earth3-AerChem'], var = ['so2']),
+        derived_exp_vars = expand(outdir + 'piClim-2xdust/derived_variables/{var}/{var}_{model}_piClim-2xdust_Ayear.nc',
+                model=['UKESM1-0-LL', 'MPI-ESM-1-2-HAM', 'EC-Earth3-AerChem'], var = ['concso4','cdncvi']),
+        derived_ctrl_vars = expand(outdir + 'piClim-control/derived_variables/{var}/{var}_{model}_piClim-control_Ayear.nc',
+                model=['UKESM1-0-LL', 'MPI-ESM-1-2-HAM', 'EC-Earth3-AerChem'], var = ['concso4','cdncvi'])
+
+    output:
+        outpath= outdir+'figs/ACP_paper/figure_S9.png'
+    conda: 
+        "dustysnake"
+    notebook:
+        "../notebooks/dust_analysis/explan_cdnc_changes.py.ipynb"
+    
+

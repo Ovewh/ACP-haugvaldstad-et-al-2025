@@ -114,9 +114,11 @@ rule calc_cloud_radiative_effect:
         outpath= outdir+'{experiment}/ERFs/{vName}/{vName}_{experiment}_{model}_{freq}.nc'
     wildcard_constraints:
         vName='CloudEff|SWCloudEff|LWCloudEff'
-
+    
     log:
         "logs/{vName}_{model}_{experiment}_{freq}.log"
+    conda:
+        "dustysnake"
     script:
         "../scripts/compute_cloud_effect.py"
 

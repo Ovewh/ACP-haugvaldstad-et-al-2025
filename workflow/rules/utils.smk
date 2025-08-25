@@ -168,7 +168,7 @@ rule derive_column_integrated_load_airmass:
         outpath = outdir + '{experiment}/derived_variables/{variable}/{variable}_{model}_{experiment}_Ayear.nc'
     wildcard_constraints:
         model='UKESM1-0-LL',
-        variable = 'concdust|concpm1|concpm10|concpm2p5|concso4|concss|concsoa|concoa|conch2oaer|concbc|concnh4|concno3'
+        variable = 'concdust|concpm1|concpm10|concpm2p5|concso4|concss|concsoa|concoa|conch2oaer|concbc|concnh4|concno3|hno3'
     conda: 
         "geocat"
 
@@ -239,5 +239,18 @@ rule calc_friction_velocity:
 
     notebook:
         "../notebooks/calc_friction_velocity.py.ipynb"
+
+rule calc_cloud_fraction:
+    input:
+        cl = lambda w: expand(output_format['single_variable'], model=w.model, experiment=w.experiment,
+                    freq='Ayear', variable='cl',ext='nc'),
+    wildcard_constraints:
+        height = 'low|middle|high'
+    output:
+        outpath = outdir + '{experiment}/derived_variables/cl{height}/cl{height}_{model}_{experiment}_Ayear.nc'
+    conda:
+        "geocat"
+    notebook:
+        "../notebooks/calc_cloud_fraction.py.ipynb"
 
     
